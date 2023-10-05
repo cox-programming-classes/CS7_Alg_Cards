@@ -2,6 +2,7 @@ namespace CS7_Alg_Cards;
 
 public record struct Card(Suit Suit, Value Value)
 {
+    public static implicit operator Card(string str) => new(str[0], str.Substring(1));
     public override string ToString() => $"{Suit}{Value}";
 }
 
@@ -16,6 +17,14 @@ public struct Suit
     {
         Spades, Hearts, Clubs, Diamonds
     };
+
+    public static implicit operator Suit(char ch)
+    {
+        if (AllSuits.Any(suit => suit._suit == ch))
+            return new(ch);
+
+        throw new InvalidCastException($"{ch} is not a valid suit.");
+    }
     
     private char _suit;
     private Suit(char s) => _suit = s;
@@ -23,7 +32,7 @@ public struct Suit
     public override string ToString() => $"{_suit}";
 }
 
-public struct Value
+public struct Value : IComparable
 {
 
     public static readonly Value AceLow = new(1);
@@ -81,5 +90,28 @@ private static readonly string[] valuesAsStrings =
 
     private Value(int val) => _value = val;
 
+    public static implicit operator Value(string str)
+    {
+        if (valuesAsStrings.Contains(str))
+            return AllValues.First(val => str == $"{val}");
+
+        if (str == "A+")
+            return new(14);
+        if (str == "A-")
+            return new(1);
+        
+        throw new InvalidCastException($"{str} is not a valid Value");
+    }
+
     public override string ToString() => valuesAsStrings[_value - 1];
+    public int CompareTo(object? obj)
+    {
+        if(obj is Value val)
+            return _value.CompareTo(val._value);
+
+        if (obj is int i)
+            return _value.CompareTo(i);
+
+        return int.MinValue;
+    }
 }
