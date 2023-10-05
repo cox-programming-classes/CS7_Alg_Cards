@@ -32,9 +32,11 @@ public struct Suit
     public override string ToString() => $"{_suit}";
 }
 
+/// <summary>
+/// A Card Value, use statically declared constants to create new cards.
+/// </summary>
 public struct Value : IComparable
 {
-
     public static readonly Value AceLow = new(1);
     public static readonly Value Two = new(2);
     public static readonly Value Three = new(3);
@@ -50,6 +52,9 @@ public struct Value : IComparable
     public static readonly Value King = new(13);
     public static readonly Value AceHigh = new(14);
 
+    /// <summary>
+    /// All Valid Values for Cards to have.
+    /// </summary>
     public static Value[] AllValues =
     {
         AceLow,
@@ -90,6 +95,12 @@ private static readonly string[] valuesAsStrings =
 
     private Value(int val) => _value = val;
 
+    /// <summary>
+    /// Implicitly Convert a Value from a String
+    /// </summary>
+    /// <param name="str">String input</param>
+    /// <returns>Value Output</returns>
+    /// <exception cref="InvalidCastException">if the provided string is not valid.</exception>
     public static implicit operator Value(string str)
     {
         if (valuesAsStrings.Contains(str))
@@ -104,6 +115,13 @@ private static readonly string[] valuesAsStrings =
     }
 
     public override string ToString() => valuesAsStrings[_value - 1];
+    
+#region Comparison Operators
+    public static bool operator <(Value a, Value b) => a._value < b._value;
+    public static bool operator >=(Value a, Value b) => !(a < b);
+    public static bool operator >(Value a, Value b) => a._value > b._value;
+    public static bool operator <=(Value a, Value b) => !(a > b);
+
     public int CompareTo(object? obj)
     {
         if(obj is Value val)
@@ -114,4 +132,5 @@ private static readonly string[] valuesAsStrings =
 
         return int.MinValue;
     }
+#endregion // Boolean Operators
 }
