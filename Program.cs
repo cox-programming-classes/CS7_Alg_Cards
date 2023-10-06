@@ -30,7 +30,7 @@ List<Card> InitializeDeck(int aceHigh = 1)
 {
     var deck = new List<Card>();
     foreach(var suit in Suit.AllSuits)
-        foreach(var value in Value.AllValues)
+        foreach(var value in Value.AllValues.Take(13))
             deck.Add(new(suit, value));
     return deck;
 }
