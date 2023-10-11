@@ -2,10 +2,17 @@
 
 using CS7_Alg_Cards;
 
-var deck = InitializeDeck();
-var deck2 = InitializeDeck();
-var deck3 = InitializeDeck();
+Random RNG = new();
 
+
+var deck = InitializeDeck();
+
+var hand = DealFromAlternate(deck, 5);
+
+foreach (var card in hand)
+    Console.WriteLine(card);
+
+/*
 Card c = deck[17]; 
 deck.RemoveAt(17);
 if(deck.Contains(new(Suit.Spades, Value.Jack)))
@@ -18,7 +25,7 @@ if(c == enteredCard)
     Console.WriteLine("You guessed it!");
 else
     foreach(var card in deck.OrderBy(c => c.Value))
-        Console.WriteLine(card);
+        Console.WriteLine(card);*/
 
 // End of Program
 
@@ -41,22 +48,42 @@ void Swap(List<Card> cards, int a, int b) =>
 // remove the first card from the list and return it
 Card DealOneFrom(List<Card> cards)
 {
-    return new();
+    var card = cards[0];
+    cards.RemoveAt(0);
+    return card;
 }
 // remove the first number of cards from the list and return them in a new list.
 List<Card> DealFrom(List<Card> cards, int quantity)
 {
-    return new();
+    List<Card> dealt = new();
+    for (var i = 0; i < quantity; i++)
+        dealt.Add(DealOneFrom(cards));
+
+    return dealt;
 }
+
+List<Card> DealFromAlternate(List<Card> cards, int quantity)
+{
+    var dealt = cards.Take(quantity).ToList();
+    cards.RemoveRange(0, quantity);
+    return dealt;
+}
+
+
 // insert a card randomly into the list of cards.
 void InsertRandomlyInto(List<Card> cards, Card card)
 {
-    
+    var pos = RNG.Next(0, cards.Count);
+    cards.Insert(pos, card);
 }
 // split the list of cards into two equal(ish) halfs and return both as new lists.
 (List<Card>, List<Card>) Split(List<Card> cards)
 {
-    return new();
+    var spice = RNG.Next(4) - 2; // Pick a random number between -2 and 2
+    var splitPoint = cards.Count / 2 + spice;
+    List<Card> a = DealFrom(cards, splitPoint);
+    List<Card> b = DealFrom(cards, cards.Count);
+    return (a, b);
 }
 // Bonus:  Implement your Shuffling Algorithm
 void Shuffle(List<Card> cards)
