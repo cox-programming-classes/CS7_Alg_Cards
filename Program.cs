@@ -42,8 +42,19 @@ List<Card> InitializeDeck(int aceHigh = 1)
     return deck;
 }
 
-void Swap(List<Card> cards, int a, int b) =>
-    (cards[a], cards[b]) = (cards[b], cards[a]);
+void Swap(List<Card> cards, int a, int b)
+{
+    if (cards.Count < 2)
+        return; // not enough cards to swap!
+
+    if (a < 0 || a >= cards.Count || 
+        b < 0 || b >= cards.Count)
+        return; // one of `a` or `b` is invalid.
+    
+    var temp = cards[a];
+    cards[a] = cards[b];
+    cards[b] = temp;
+}
 
 // remove the first card from the list and return it
 Card DealOneFrom(List<Card> cards)
@@ -63,7 +74,7 @@ List<Card> DealFrom(List<Card> cards, int quantity)
 }
 
 List<Card> DealFromAlternate(List<Card> cards, int quantity)
-{
+{   
     var dealt = cards.Take(quantity).ToList();
     cards.RemoveRange(0, quantity);
     return dealt;
@@ -88,5 +99,6 @@ void InsertRandomlyInto(List<Card> cards, Card card)
 // Bonus:  Implement your Shuffling Algorithm
 void Shuffle(List<Card> cards)
 {
-    
+    (var a, var b) = Split(cards);
+
 }
