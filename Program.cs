@@ -7,9 +7,9 @@ Random RNG = new();
 
 var deck = InitializeDeck();
 
-var hand = DealFromAlternate(deck, 5);
+Shuffle(deck);
 
-foreach (var card in hand)
+foreach (var card in deck)
     Console.WriteLine(card);
 
 /*
@@ -35,6 +35,8 @@ else
 
 List<Card> InitializeDeck(int aceHigh = 1)
 {
+    if (aceHigh < 0 || aceHigh > 1)
+        aceHigh = 1;
     var deck = new List<Card>();
     foreach(var suit in Suit.AllSuits)
         foreach(var value in Value.AllValues.Take(13))
@@ -44,16 +46,14 @@ List<Card> InitializeDeck(int aceHigh = 1)
 
 void Swap(List<Card> cards, int a, int b)
 {
-    if (cards.Count < 2)
-        return; // not enough cards to swap!
+    if (!cards.Any())
+        return;
 
-    if (a < 0 || a >= cards.Count || 
+    if (a < 0 || a >= cards.Count ||
         b < 0 || b >= cards.Count)
-        return; // one of `a` or `b` is invalid.
+        return;
     
-    var temp = cards[a];
-    cards[a] = cards[b];
-    cards[b] = temp;
+    (cards[a], cards[b]) = (cards[b], cards[a]);
 }
 
 // remove the first card from the list and return it
@@ -99,6 +99,19 @@ void InsertRandomlyInto(List<Card> cards, Card card)
 // Bonus:  Implement your Shuffling Algorithm
 void Shuffle(List<Card> cards)
 {
+    // Split `cards` into `a` and `b`
     (var a, var b) = Split(cards);
 
+    while (a.Any() || b.Any())
+    {
+        var chooseA = RNG.Next(2) == 1;
+        // if there are cards AND `a` is not empty...
+        if(chooseA && a.Any())
+            InsertRandomlyInto(cards, DealOneFrom(a));
+        // otherwise, if `b` is not empty...
+        else if(b.Any())
+            InsertRandomlyInto(cards, DealOneFrom(b));
+        else if(!chooseA && !b.Any())
+            InsertRandomlyInto(cards, DealOneFrom(a));
+    }
 }
