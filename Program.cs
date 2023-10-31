@@ -9,6 +9,25 @@ var deck = InitializeDeck();
 
 Shuffle(deck);
 
+while (true)
+{
+    try
+    {
+        var card = DealOneFrom(deck);
+        Console.WriteLine(card);
+    }
+    catch (InvalidOperationException)
+    {
+        // do nothing
+        break;
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e.Message);
+        break;
+    }
+}
+
 foreach (var card in deck)
     Console.WriteLine(card);
 
@@ -59,6 +78,10 @@ void Swap(List<Card> cards, int a, int b)
 // remove the first card from the list and return it
 Card DealOneFrom(List<Card> cards)
 {
+    if (!cards.Any())
+    {
+        throw new InvalidOperationException("You don't have any cards!");
+    }
     var card = cards[0];
     cards.RemoveAt(0);
     return card;
@@ -66,6 +89,11 @@ Card DealOneFrom(List<Card> cards)
 // remove the first number of cards from the list and return them in a new list.
 List<Card> DealFrom(List<Card> cards, int quantity)
 {
+    if (quantity > cards.Count)
+    {
+        throw new InvalidOperationException($"You don't have {quantity} cards left.");
+    }
+    
     List<Card> dealt = new();
     for (var i = 0; i < quantity; i++)
         dealt.Add(DealOneFrom(cards));
@@ -80,18 +108,17 @@ List<Card> DealFromAlternate(List<Card> cards, int quantity)
     return dealt;
 }
 
-
 // insert a card randomly into the list of cards.
 void InsertRandomlyInto(List<Card> cards, Card card)
 {
     var pos = RNG.Next(0, cards.Count);
     cards.Insert(pos, card);
 }
+
 // split the list of cards into two equal(ish) halfs and return both as new lists.
 (List<Card>, List<Card>) Split(List<Card> cards)
 {
-    var spice = RNG.Next(4) - 2; // Pick a random number between -2 and 2
-    var splitPoint = cards.Count / 2 + spice;
+    var splitPoint = cards.Count / 2 ;
     List<Card> a = DealFrom(cards, splitPoint);
     List<Card> b = DealFrom(cards, cards.Count);
     return (a, b);
