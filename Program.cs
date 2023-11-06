@@ -1,55 +1,96 @@
 ﻿/// Let's Write A Card Game!
 
+using System.Runtime.Serialization;
+using System.Security.Cryptography;
 using CS7_Alg_Cards;
 
+#region Initialization
 Random RNG = new();
-
-
 var deck = InitializeDeck();
-
 Shuffle(deck);
+(var p1, var p2) = Split(deck);
+#endregion
 
-while (true)
+#region The Game!
+
+// until one player is out of cards.
+while (p1.Any() && p2.Any())
 {
-    try
+    Console.WriteLine($"Player 1 has {p1.Count} cards");
+    Console.WriteLine($"Player 2 has {p2.Count} cards");
+    var c1 = DealOneFrom(p1);
+    var c2 = DealOneFrom(p2);
+    Console.WriteLine($"Player 1:  {c1}\t:\tPlayer 2:  {c2}");
+    Console.ReadKey(); 
+    if (c1.Value > c2.Value)
     {
-        var card = DealOneFrom(deck);
-        Console.WriteLine(card);
+        Console.WriteLine("Player 1 Wins the round!");
+        p1.Add(c1);
+        p1.Add(c2);
     }
-    catch (InvalidOperationException)
+    else if (c2.Value > c1.Value)
     {
-        // do nothing
-        break;
+        Console.WriteLine("Player 2 Wins the round!");
+        p2.Add(c1);
+        p2.Add(c2);
     }
-    catch (Exception e)
+    else
     {
-        Console.WriteLine(e.Message);
-        break;
+        Console.WriteLine("WARRRRRRR");
+        WAR(p1, p2, c1, c2);
     }
 }
 
-foreach (var card in deck)
-    Console.WriteLine(card);
+Console.WriteLine($"Player {(p1.Any()?1:2)} Wins!");
 
-/*
-Card c = deck[17]; 
-deck.RemoveAt(17);
-if(deck.Contains(new(Suit.Spades, Value.Jack)))
-    Console.WriteLine("Found it!");
 
-Console.WriteLine("Type a card value! (with the \u2660 \u2661 \u2663 \u2662 suits)");
-Card enteredCard = Console.ReadLine()!;  // Woah you can Type a card!~?!?!
 
-if(c == enteredCard)
-    Console.WriteLine("You guessed it!");
-else
-    foreach(var card in deck.OrderBy(c => c.Value))
-        Console.WriteLine(card);*/
+void WAR(List<Card> p1, List<Card> p2, Card c1, Card c2, List<Card>? wz = default)
+{
+    if (wz == default)
+        wz = new () {c1, c2};
+    else
+    {
+        wz.Add(c1);
+        wz.Add(c2);
+    }
+    // Deal 3 each from p1 and p2 into warzone
+    
+    wz.AddRange(DealFrom(p1, 3));
+    wz.AddRange(DealFrom(p2, 3));
+    c1 = DealOneFrom(p1);
+    c2 = DealOneFrom(p2);
+    Console.WriteLine($"Player 1:  {c1}\t:\tPlayer 2:  {c2}");
+    Console.ReadKey();
+    if (c1.Value > c2.Value)
+    {
+        Console.WriteLine($"Player 1 wins the WAR with {wz.Count + 2} cards!");
+        p1.Add(c1);
+        p1.Add(c2);
+        p1.AddRange(wz);
+    }
+    else if (c2.Value > c1.Value)
+    {
+        Console.WriteLine($"Player 2 wins the WAR with {wz.Count + 2} cards!");
+        p2.Add(c1);
+        p2.Add(c2);
+        p2.AddRange(wz);
+    }
+    else
+    {
+        Console.WriteLine("OMG AGAIN");
+        WAR(p1, p2, c1, c2, wz);
+    }
+}
+
+#endregion
+
+
 
 // End of Program
 
 //-------------------------------------------------------
-// Methods Start Here
+#region Methods Start Here
 //-------------------------------------------------------
 
 List<Card> InitializeDeck(int aceHigh = 1)
@@ -142,3 +183,4 @@ void Shuffle(List<Card> cards)
             InsertRandomlyInto(cards, DealOneFrom(a));
     }
 }
+#endregion // methods
